@@ -1,0 +1,7 @@
+.env
+/vendor
+/var
+/ETL/env
+/ETL/venv
+venv
+/ETL/log

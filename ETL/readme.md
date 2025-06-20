@@ -1,0 +1,2 @@
+ python etl_suivi_pandemie.py --input_file data/covid.csv --virus_id 1 --nom_maladie "covid-19" --description "ajout du data-sets sur le covid-19"
+ python etl_suivi_pandemie3.py --input_file data/variole.csv --virus_id 2 --nom_maladie "variole du singe" --description "ajout du data-sets sur la variole du singe"            
