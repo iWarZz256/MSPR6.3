@@ -5,3 +5,4 @@
 /ETL/venv
 venv
 /ETL/log
+node_modules/
