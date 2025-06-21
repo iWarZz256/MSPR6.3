@@ -1,0 +1,17 @@
+@import './modern_medical_dashboard.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    20%, 80% { opacity: 1; }
+  }
+  
+  .animate-fade-in-out {
+    animation: fadeInOut 2s ease-in-out infinite;
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }

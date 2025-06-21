@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* === Custom Styles === */
+
+body {
+  @apply bg-gray-50 text-gray-800 font-sans;
+}
+
+.sidebar {
+  @apply bg-gradient-to-b from-cyan-900 to-blue-800 text-white shadow-lg;
+}
+
+.main-title {
+  @apply text-4xl font-bold text-blue-700 text-center mb-4;
+}
+
+.card {
+  @apply bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition-all duration-200;
+}
+
+.chart-title {
+  @apply text-xl font-semibold mb-3 text-blue-800;
+}
+
+.legend-box {
+  @apply absolute bottom-4 left-4 bg-white bg-opacity-80 p-3 text-sm rounded-lg shadow-lg;
+}
+
+.legend-box div span {
+  @apply inline-block w-4 h-4 mr-2 rounded;
+}
+
+.map-container {
+  @apply overflow-hidden rounded-xl shadow-md;
+}
+.leaflet-container:focus {
+  outline: none !important;
+}
+
