@@ -23,17 +23,16 @@ router = APIRouter(prefix="/predict", tags=["predict"])
 # Paths
 BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, "model", "RandomForest_covid.pkl")
-FEAT_PATH  = os.path.join(BASE_DIR, "model", "feature_names.pkl")
+
 
 # Vérification
 if not os.path.exists(MODEL_PATH):
     raise RuntimeError(f"Modèle introuvable à {MODEL_PATH}")
-if not os.path.exists(FEAT_PATH):
-    raise RuntimeError(f"Fichier feature_names introuvable à {FEAT_PATH}")
+
 
 # Chargement du modèle et des noms de features
 model = joblib.load(MODEL_PATH)
-feature_cols = joblib.load(FEAT_PATH)
+
 
 # Schéma de sortie
 class Prediction(BaseModel):
@@ -84,10 +83,8 @@ def predict_by_name(maladie: str, pays: str):
     df_feats = creer_features(df)
 
     # 5. Préparation de X uniquement avec les features du pays
-    try:
-        X_df = df_feats[feature_cols]
-    except KeyError as ke:
-        raise HTTPException(status_code=500, detail=f"Feature manquante: {ke}")
+    feature_cols = [c for c in df_feats.columns if c not in ('nouveau_cas','nouveau_mort','total_cas')]
+    X_df = df_feats[feature_cols]
     X = X_df.values
 
     # 6. Prédiction (sur échelle log1p)
