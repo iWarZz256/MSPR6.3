@@ -63,6 +63,9 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
     const bounds = country?.geometry ? getLargestPolygonBounds(country.geometry) : null
     const [population, setPopulation] = useState(null)
     const [predictionData, setPredictionData] = useState([]);
+    const [tauxMortalite, setTauxMortalite] = useState(null);
+    const [tauxTransmission, setTauxTransmission] = useState(null);
+    const [selectedDataType, setSelectedDataType] = useState('classic'); // State to track selected data type
 
 
    useEffect(() => {
@@ -74,6 +77,39 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
     }
     console.log("country.code", country.code)
     const paysIso = country.code.toLowerCase();
+    fetch(`http://${ip}:8000/predict/mortalite/${encodeURIComponent(selectedVirus)}/${paysIso}`)
+            .then(data => {
+            if (!data.ok) throw new Error(`Erreur ${data.status}`);
+            return data.json();
+            }).then(data => {
+                const taux = data.map(entry => ({
+                    date: entry.date,
+                    tauxMortalite: entry.taux ? Number(entry.taux) : 0 // Default to 0 if invalid
+                }));
+                console.log("✅ Taux de mortalité récupéré :", taux);
+                setTauxMortalite(taux);
+            })
+            .catch(err => {
+                console.error("❌ Échec récupération taux de mortalité :", err);
+                setTauxMortalite([]);
+            });
+
+    fetch(`http://${ip}:8000/predict/transmission/${encodeURIComponent(selectedVirus)}/${paysIso}`)
+      .then(res => {
+        if (!res.ok) throw new Error(`Erreur ${res.status}`);
+        return res.json();
+      }
+        )
+        .then(data => {
+        const taux = data.map(entry => ({
+          date: entry.date,
+            tauxTransmission: entry.taux ? Number(entry.taux) : 0 // Default to 0 if invalid
+        }));
+        console.log("✅ Taux de transmission récupéré :", taux);
+
+        setTauxTransmission(taux);
+      })
+
     const url = `http://${ip}:8000/predict/${encodeURIComponent(selectedVirus)}/${paysIso}`;
     console.log("➡️ URL prédiction :", url);
     fetch(url)
@@ -82,12 +118,15 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
         return res.json();
       })
       .then(data => {
-  console.log(" raw prediction API response:", data);
+    console.log(" raw prediction API response:", data);
   // data est directement un tableau de { date, predit }
   const formatted = data.map(entry => ({
     date: entry.date,
     predit: Number(entry.predit)
   }));
+
+
+
   console.log(" formatted predictionData:", formatted);
   setPredictionData(formatted);
 })
@@ -97,6 +136,7 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
       });
   }, [country?.code, selectedVirus]);
     
+  
     useEffect(() => {
         if (!country?.code) return
 
@@ -141,33 +181,50 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
 
 useEffect(() => {
   const table = {};
-    console.log("table brute avant tri :", table);
-  // 1) Historique (quotidien)
+
+  // Map historical data
   historicalData.forEach(({ date, cases, deaths, recovered }) => {
     table[date] = {
       ...table[date],
       date,
       cases,
       deaths,
-      recovered
+      recovered,
     };
   });
 
-  // 2) Prédiction (quotidienne)
+  // Map prediction data
   predictionData.forEach(({ date, predit }) => {
     table[date] = {
       ...table[date],
       date,
-      predit
+      predit,
     };
   });
-   console.log("✅ table brute APRÈS remplissage :", table);
-  // 3) Tri chronologique
-  const merged = Object.values(table)
-    .sort((a, b) => new Date(a.date) - new Date(b.date));
-   //console.log("chartData final :", merged);
+
+  // Map tauxMortalite
+  tauxMortalite?.forEach(({ date, tauxMortalite }) => {
+    table[date] = {
+      ...table[date],
+      date,
+      tauxMortalite,
+    };
+  });
+
+  // Map tauxTransmission
+  tauxTransmission?.forEach(({ date, tauxTransmission }) => {
+    table[date] = {
+      ...table[date],
+      date,
+      tauxTransmission,
+    };
+  });
+
+  // Merge and sort data
+  const merged = Object.values(table).sort((a, b) => new Date(a.date) - new Date(b.date));
   setChartData(merged);
-}, [historicalData, predictionData]);
+}, [historicalData, predictionData, tauxMortalite, tauxTransmission]);
+
 
     if (!country || !country.bounds || !country.geometry) return null
     //console.log("VALEUR CHARDATA",chartData);
@@ -241,7 +298,7 @@ useEffect(() => {
                         <h3 className="text-xl font-semibold mb-4 text-gray-800">Évolution épidémiologique</h3>
                         <div className="h-72 bg-gray-50 rounded-xl shadow-inner p-4">
                             <ResponsiveContainer width="100%" height="100%">
-                                <LineChart data={chartData}>
+                                <LineChart data={selectedDataType === 'classic' ? chartData.map(({ date, cases, deaths, recovered, predit }) => ({ date, cases, deaths, recovered, predit })) : chartData.map(({ date, tauxMortalite, tauxTransmission }) => ({ date, tauxMortalite, tauxTransmission }))}>
                                     <defs>
                                         <linearGradient id="colorCases" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#8884d8" stopOpacity={0.3} />
@@ -265,48 +322,88 @@ useEffect(() => {
                                     labelFormatter={d => `Date : ${d}`}
                                     formatter={(value, name) => [value.toLocaleString(), name]}
                                      />
-                                    <Legend verticalAlign="top" iconType="circle" height={36} />
+                                    <Legend 
+                                        verticalAlign="top" 
+                                        iconType="circle" 
+                                        height={36} 
+                                        payload={selectedDataType === 'classic' 
+                                            ? [
+                                                { value: 'Cas', type: 'line', color: '#8884d8' },
+                                                { value: 'Morts', type: 'line', color: '#e53e3e' },
+                                                { value: 'Guérisons', type: 'line', color: '#38a169' },
+                                                { value: 'Prédiction', type: 'line', color: '#fa9965' }
+                                              ]
+                                            : [
+                                                { value: 'Taux Mortalité', type: 'line', color: '#8884d8' },
+                                                { value: 'Taux Transmission', type: 'line', color: '#e53e3e' }
+
+                                              ]
+                                        }
+                                    />
                                     <CartesianGrid strokeDasharray="2 4" stroke="#f0f0f0" />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="cases"
-                                        name="Cas"
-                                        stroke="#8884d8"
-                                        strokeWidth={2.5}
-                                        dot={false}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="deaths"
-                                        name="Morts"
-                                        stroke="#e53e3e"
-                                        strokeWidth={2.5}
-                                        dot={false}
-                                    />
-                                    <Line
-                                        type="monotone"
-                                        dataKey="recovered"
-                                        name="Guérisons"
-                                        stroke="#38a169"
-                                        strokeWidth={2.5}
-                                        dot={false}
-                                    />
-                                    <Line
-                                    type="monotone"
-                                    dataKey="predit"
-                                    name="Prédiction"
-                                    stroke="#fa9965"
-                                    strokeWidth={2.5}
-                                    dot={false}
-                                    strokeDasharray="5 5"
-                                    isAnimationActive={false}
-                                    />
+                                    {selectedDataType === 'classic' ? (
+                                        <>
+                                            <Line
+                                                type="monotone"
+                                                dataKey="cases"
+                                                name="Cas"
+                                                stroke="#8884d8"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="deaths"
+                                                name="Morts"
+                                                stroke="#e53e3e"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="recovered"
+                                                name="Guérisons"
+                                                stroke="#38a169"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="predit"
+                                                name="Prédiction"
+                                                stroke="#fa9965"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                                isAnimationActive={false}
+                                            />
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Line
+                                                type="monotone"
+                                                dataKey="tauxMortalite"
+                                                name="Taux Mortalité"
+                                                stroke="#8884d8"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                            />
+                                            <Line
+                                                type="monotone"
+                                                dataKey="tauxTransmission"
+                                                name="Taux Transmission"
+                                                stroke="#e53e3e"
+                                                strokeWidth={2.5}
+                                                dot={false}
+                                            />
+                                        </>
+                                    )}
+                                    <YAxis yAxisId={1} tick={{ fontSize: 12 }} />
+                                   
                                 </LineChart>
                             </ResponsiveContainer>
                         </div>
 
-                        <div className="mt-6 flex flex-row gap-4">
-                            {/*  Recommandation */}
+                        <div className="mt-3 flex flex-row gap-4">
                             <div className="w-full bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4 shadow">
                                 <h4 className="text-md font-semibold text-blue-800 mb-2">📈 Projection des cas</h4>
                                 <p className="text-sm text-blue-900 leading-relaxed">
@@ -320,6 +417,22 @@ useEffect(() => {
                                 </p>
                             </div>
                         </div>
+
+                        {/* Add styling to radio buttons */}
+<div className="flex justify-center gap-4 mt-3">
+  <button
+    onClick={() => setSelectedDataType('classic')}
+    className={`px-4 py-2 rounded-lg font-medium transition duration-200 ease-in-out ${selectedDataType === 'classic' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+  >
+    Données classiques
+  </button>
+  <button
+    onClick={() => setSelectedDataType('mortality')}
+    className={`px-4 py-2 rounded-lg font-medium transition duration-200 ease-in-out ${selectedDataType === 'mortality' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
+  >
+    Taux de mortalité <br></br>et de transmission
+  </button>
+</div>
                     </div>
                 </div>
             </div>
