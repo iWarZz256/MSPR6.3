@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Text, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import Column, Integer, String, Date, DateTime, Text, ForeignKey, UniqueConstraint, Index, Boolean
 from sqlalchemy.orm import relationship
 from database import Base  # ton Base SQLAlchemy
 
@@ -88,3 +88,10 @@ class SuiviPandemie(Base):
         Index('IDX_D9D63CE72F3440E1', 'id_pandemie'),
         Index('IDX_D9D63CE7A6E44244', 'pays_id'),
     )
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(150), unique=True, nullable=False)
+    password_hash = Column(String(256), nullable=False)
+    is_admin = Column(Boolean, default=False)
