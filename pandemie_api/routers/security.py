@@ -4,7 +4,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt, JWTError
 
-# À adapter selon ton projet :
+
 SECRET_KEY = "un_secret_a_definir"  # Remplace par une clé secrète solide
 ALGORITHM = "HS256"
 

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from security import get_current_user, admin_required
+from .security import get_current_user, admin_required
 
 router = APIRouter()
 
