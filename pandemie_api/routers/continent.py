@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 import crud, schemas
 from database import get_db
-from security import get_current_user, admin_required
+from .security import get_current_user, admin_required
 
 router = APIRouter(prefix="/continents", tags=["continents"])
 
