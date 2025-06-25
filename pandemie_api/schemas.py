@@ -147,3 +147,12 @@ class SuiviPandemie(SuiviPandemieBase):
     id_suivi: int
     class Config:
         orm_mode = True
+
+# ----- User -----
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class UserLogin(BaseModel):
+    username: str
+    password: str

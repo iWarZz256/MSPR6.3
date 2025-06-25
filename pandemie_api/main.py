@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database import Base, engine
-from routers import continent, pays, famille, virus, logging, pandemie, suivi
+from routers import continent, pays, famille, virus, logging, pandemie, suivi, auth, user
 from fastapi.middleware.cors import CORSMiddleware
 from predict import router as predict_router
 from predict import model
@@ -33,6 +33,8 @@ app.include_router(logging.router)
 app.include_router(pandemie.router)
 app.include_router(suivi.router)
 app.include_router(predict_router)
+app.include_router(auth.router)
+app.include_router(user.router)
 
 @app.get("/")
 def read_root():
