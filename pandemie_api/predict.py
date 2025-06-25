@@ -104,3 +104,61 @@ def predict_by_name(maladie: str, pays: str):
         results.append(Prediction(date=dates[i], predit=float(running_total)))
 
     return results
+
+class TauxResult(BaseModel):
+    date: str
+    taux: float
+
+@router.get("/transmission/{maladie}/{pays}", response_model=List[TauxResult])
+def taux_transmission(maladie: str, pays: str):
+    pandemi_id = get_pandemie_id(maladie)
+    pays_id    = get_pays_id(pays)
+    try:
+        df_raw = charger_donnees(pandemi_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    df = (
+        df_raw.reset_index()
+              .query("pays_id == @pays_id")
+              .set_index("date_jour")
+    )
+    if df.empty:
+        raise HTTPException(status_code=404, detail=f"Aucun enregistrement pour pays '{pays}'")
+
+    # Calcul du taux de transmission : nouveaux cas / nouveaux cas de la veille
+    taux_transmission = (df['nouveau_cas'] / df['nouveau_cas'].shift(1)).replace([np.inf, -np.inf], np.nan).fillna(0)
+
+    dates = taux_transmission.index.strftime('%Y-%m-%d').tolist()
+    results = [
+        TauxResult(date=date, taux=float(tx))
+        for date, tx in zip(dates, taux_transmission.values)
+    ]
+    return results
+
+@router.get("/mortalite/{maladie}/{pays}", response_model=List[TauxResult])
+def taux_mortalite(maladie: str, pays: str):
+    pandemi_id = get_pandemie_id(maladie)
+    pays_id    = get_pays_id(pays)
+    try:
+        df_raw = charger_donnees(pandemi_id)
+    except ValueError as e:
+        raise HTTPException(status_code=404, detail=str(e))
+
+    df = (
+        df_raw.reset_index()
+              .query("pays_id == @pays_id")
+              .set_index("date_jour")
+    )
+    if df.empty:
+        raise HTTPException(status_code=404, detail=f"Aucun enregistrement pour pays '{pays}'")
+
+    # Calcul du taux de mortalité : nouveaux morts / nouveaux cas (en %)
+    taux_mortalite = (df['nouveau_mort'] / df['nouveau_cas']).replace([np.inf, -np.inf], np.nan).fillna(0) * 100
+
+    dates = taux_mortalite.index.strftime('%Y-%m-%d').tolist()
+    results = [
+        TauxResult(date=date, taux=float(tx))
+        for date, tx in zip(dates, taux_mortalite.values)
+    ]
+    return results

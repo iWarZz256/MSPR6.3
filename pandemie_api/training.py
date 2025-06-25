@@ -100,9 +100,10 @@ def main():
     # CV time-series
     tscv = TimeSeriesSplit(n_splits=5)
     param_grid = {
-        'n_estimators': [100, 200],
-        'max_depth': [5, 10, None],
-        'min_samples_leaf': [1, 5, 10]
+        'n_estimators': [100,200,300],
+        'max_depth': [5,10,None],
+        'min_samples_leaf': [1,2,5],
+        'max_features':[None, "sqrt", "log2"]
     }
     rf = RandomForestRegressor(random_state=42)
     grid = GridSearchCV(rf, param_grid, cv=tscv, scoring='neg_mean_absolute_error', n_jobs=-1)
@@ -118,11 +119,15 @@ def main():
     mse  = mean_squared_error(y_true, y_pred)
     rmse = np.sqrt(mse)
     mape = np.mean(np.abs((y_true - y_pred)/np.where(y_true==0,1,y_true))) *100
-    print(f"MAE:{mae:.2f}|RMSE:{rmse:.2f}|MAPE:{mape:.2f}%")
+
+    # Calcul de la moyenne de la target réelle
+    mean_target = y_true.mean()
+
+    print(f"MAE:{mae:.2f}|RMSE:{rmse:.2f}|MAPE:{mape:.2f}%|Moyenne de la cible:{mean_target:.2f}")
 
     # sauvegarde
     os.makedirs(args.out, exist_ok=True)
-    joblib.dump(best, os.path.join(args.out,'RandomForest_covid.pkl'))
+    joblib.dump(best, os.path.join(args.out,'RandomForest_variole.pkl'))
     joblib.dump(feature_cols, os.path.join(args.out,'feature_names.pkl'))
     print('Model & features saved')
 
