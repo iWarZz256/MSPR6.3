@@ -7,3 +7,5 @@ venv
 /ETL/log
 node_modules/
 __pycache__/
+suppr/
+pandemie_api/__pycache__/
