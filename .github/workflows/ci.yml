@@ -26,8 +26,11 @@ jobs:
 
     - name: ✅ Lancer les tests backend
       working-directory: ./pandemie_api
+      env:
+        DATABASE_URL: "sqlite:///./test.db"
       run: |
         pytest
+
 
     # Frontend (React)
     - name: 🧱 Setup Node.js pour React

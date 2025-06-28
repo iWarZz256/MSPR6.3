@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./test.db")
 DATABASE_URL = (
     f"mysql+pymysql://{os.getenv('DB_USER')}:"
     f"{os.getenv('DB_PASSWORD')}@"
