@@ -31,7 +31,12 @@ if not os.path.exists(MODEL_PATH):
 
 
 # Chargement du modèle et des noms de features
-model = joblib.load(MODEL_PATH)
+model = None
+if os.path.exists(MODEL_PATH):
+    try:
+        model = joblib.load(MODEL_PATH)
+    except Exception as e:
+        print(f"[WARNING] Erreur lors du chargement du modèle : {e}")
 
 
 # Schéma de sortie
