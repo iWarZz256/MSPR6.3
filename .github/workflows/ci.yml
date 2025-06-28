@@ -44,7 +44,7 @@ jobs:
         npm install
 
     - name: 🚫 Skip tests React (aucun script "test")
-      working-directory: ./frontend
+      working-directory: ./front
       run: echo "Pas de tests définis pour le frontend, étape ignorée"
 
 
