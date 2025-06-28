@@ -1,0 +1,51 @@
+name: CI/CD - PVDH
+
+on:
+  push:
+    branches: [ main, dev ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout du code
+      uses: actions/checkout@v3
+
+    # Backend (FastAPI)
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.11
+
+    - name: 📦 Installer les dépendances backend
+      working-directory: ./pandemie_api
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: ✅ Lancer les tests backend
+      working-directory: ./pandemie_api
+      run: |
+        pytest
+
+    # Frontend (React)
+    - name: 🧱 Setup Node.js pour React
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+
+    - name: 📦 Installer les dépendances frontend
+      working-directory: ./front
+      run: |
+        npm install
+
+    - name: 🧪 Lancer les tests React
+      working-directory: ./front
+      run: |
+        npm test -- --watchAll=false
+
+    - name: ⚙️ Build du frontend React
+      working-directory: ./front
+      run: |
+        npm run build

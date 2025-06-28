@@ -7,16 +7,29 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = (e) => {
-    e.preventDefault()
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError('');
 
-    // 🔐 Exemple de validation simple à adapter
-    if (username === 'admin' && password === 'admin123') {
-      navigate('/') // redirige vers le dashboard
-    } else {
-      setError('Identifiants incorrects. Veuillez réessayer.')
+    try {
+      const res = await fetch(`http://${ip}:8000/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!res.ok) {
+        throw new Error('Identifiants incorrects');
+      }
+
+      const data = await res.json();
+      localStorage.setItem('token', data.access_token);
+      navigate('/');
+    } catch (err) {
+      setError(err.message);
     }
-  }
+  };
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-blue-50 px-4">

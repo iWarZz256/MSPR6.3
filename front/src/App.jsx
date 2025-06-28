@@ -9,6 +9,7 @@ import PaysAdmin from './PaysAdmin'
 import VirusAdmin from './VirusAdmin'
 import MobileDashboard from './MobileDashboard'
 import LoginPage from './LoginPage'
+import PrivateRoute from './components/PrivateRoute'
 
 // Redirection auto mobile
 function MobileRedirector() {
@@ -25,20 +26,23 @@ function MobileRedirector() {
 }
 
 function App() {
-
   return (
     <BrowserRouter>
       <MobileRedirector />
       <Routes>
-        <Route path="/" element={<PandemicDashboard />} />
+        {/* Publiques */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="/admin/continents" element={<ContinentsAdmin />} />
-        <Route path="/admin/familles" element={<FamillesAdmin />} />
-        <Route path="/admin/pandemies" element={<PandemiesAdmin />} />
-        <Route path="/admin/pays" element={<PaysAdmin />} />
-        <Route path="/admin/virus" element={<VirusAdmin />} />
+        {/* Protégées */}
+        <Route path="/" element={<PrivateRoute><PandemicDashboard /></PrivateRoute>} />
         <Route path="/mobile" element={<MobileDashboard />} />
+        <Route path="/admin" element={<PrivateRoute><AdminPage /></PrivateRoute>} />
+        <Route path="/admin/continents" element={<PrivateRoute><ContinentsAdmin /></PrivateRoute>} />
+        <Route path="/admin/familles" element={<PrivateRoute><FamillesAdmin /></PrivateRoute>} />
+        <Route path="/admin/pandemies" element={<PrivateRoute><PandemiesAdmin /></PrivateRoute>} />
+        <Route path="/admin/pays" element={<PrivateRoute><PaysAdmin /></PrivateRoute>} />
+        <Route path="/admin/virus" element={<PrivateRoute><VirusAdmin /></PrivateRoute>} />
+
+        {/* Fallback */}
         <Route path="*" element={<div>Cette route n'existe pas</div>} />
       </Routes>
     </BrowserRouter>
