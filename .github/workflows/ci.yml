@@ -43,6 +43,7 @@ jobs:
       run: |
         npm install
 
+
     - name: ⚙️ Build du frontend React
       working-directory: ./front
       run: |
@@ -57,8 +58,8 @@ jobs:
 
     - name: 🏗️ Construction de l'image Docker
       run: |
-        docker build -t quentincrn08/tonimage:${{ github.ref_name }} .
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/tonimage:${{ github.ref_name }} .
 
     - name: 📤 Push de l'image Docker
       run: |
-        docker push quentincrn08/tonimage:${{ github.ref_name }}
+        docker push ${{ secrets.DOCKER_USERNAME }}/tonimage:${{ github.ref_name }}
