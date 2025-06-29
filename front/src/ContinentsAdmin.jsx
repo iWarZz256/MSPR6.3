@@ -20,6 +20,7 @@ export default function ContinentsAdmin() {
   ])
   const location = useLocation()
 
+  //test docker
   const cards = [
     { title: "Continents", to: "/admin/continents", icon: "🌍" },
     { title: "Familles", to: "/admin/familles", icon: "🧬" },
