@@ -40,7 +40,8 @@ jobs:
           echo "BRANCH = ${{ github.ref_name }}"
 
       - name: 🏗️ Build Docker image
-        run: docker buildx build --tag ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }} ./front --load
+        run: docker buildx build --tag quentincrn08/front:${{ github.ref_name }} -f ./front/Dockerfile ./front --load
+
 
       - name: 📤 Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }}
