@@ -9,9 +9,6 @@ on:
 jobs:
   build-frontend:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./front
 
     steps:
       - name: 📥 Checkout code
@@ -23,9 +20,11 @@ jobs:
           node-version: 18
 
       - name: 📦 Installer les dépendances
+        working-directory: ./front
         run: npm ci
 
       - name: ⚙️ Build du frontend
+        working-directory: ./front
         run: npm run build
 
       - name: 🐳 Login to Docker Hub
@@ -40,8 +39,7 @@ jobs:
           echo "BRANCH = ${{ github.ref_name }}"
 
       - name: 🏗️ Build Docker image
-        run: docker buildx build --tag quentincrn08/front:${{ github.ref_name }} -f ./front/Dockerfile ./front --load
-
+        run: docker buildx build --tag ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }} -f front/Dockerfile front --load
 
       - name: 📤 Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }}
