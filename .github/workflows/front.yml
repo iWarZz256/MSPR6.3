@@ -30,4 +30,4 @@ jobs:
 
 
       - name: 📤 Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }}
+        run: docker push quentincrn08/front:${{ github.ref_name }}

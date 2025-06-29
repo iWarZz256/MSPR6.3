@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: 🏗️ Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ia:${{ github.ref_name }} ./IA
+        run: docker build -t quentincrn08/ia:${{ github.ref_name }} ./IA
 
       - name: 📤 Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/ia:${{ github.ref_name }}
+        run: docker push quentincrn08/ia:${{ github.ref_name }}

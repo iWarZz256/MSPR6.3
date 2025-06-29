@@ -62,8 +62,8 @@ jobs:
 
     - name: 🏗️ Construction de l'image Docker
       run: |
-        docker build -t ${{ secrets.DOCKER_USERNAME }}/tonimage:${{ github.ref_name }} .
+        docker build -t quentincrn08/tonimage:${{ github.ref_name }} .
 
     - name: 📤 Push de l'image Docker
       run: |
-        docker push ${{ secrets.DOCKER_USERNAME }}/tonimage:${{ github.ref_name }}
+        docker push quentincrn08/tonimage:${{ github.ref_name }}
