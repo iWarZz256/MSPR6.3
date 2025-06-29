@@ -1,15 +1,19 @@
 import React, { useState, useEffect } from 'react'
 import logo from '../assets/PVDH.png'
+const API_URL = import.meta.env.VITE_API_URL;
 
 const messages = [
+  import.meta.env.VITE_API_URL,
   "Chargement des données de santé...",
   "Connexion sécurisée à PVDH..."
 ]
 
 export default function LoadingScreen() {
   const [messageIndex, setMessageIndex] = useState(0)
-
+  
   useEffect(() => {
+    
+    console.log(API_URL);
     // Changement de message toutes les 2 secondes
     const interval = setInterval(() => {
       setMessageIndex(prev => (prev + 1) % messages.length)

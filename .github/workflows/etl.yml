@@ -1,0 +1,21 @@
+name: CI/CD - ETL
+
+on:
+  push:
+    paths:
+      - 'ETL/**'
+      - '.github/workflows/etl.yml'
+
+jobs:
+  build-etl:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Build Docker image
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/etl:${{ github.ref_name }} ./ETL
+
+    - name: Push image
+      run: |
+        echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+        docker push ${{ secrets.DOCKER_USERNAME }}/etl:${{ github.ref_name }}

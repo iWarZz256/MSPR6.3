@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mspr2
+    ports:
+      - "3307:3306"
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+    env_file:
+      - .env
+
+    environment:
+      DATABASE_URL: "mysql+pymysql://root:root@mysql:3306/pandemie_db"

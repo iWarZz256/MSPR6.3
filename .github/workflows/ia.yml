@@ -1,0 +1,26 @@
+name: CI/CD - IA
+
+on:
+  push:
+    paths:
+      - 'IA/**'
+      - '.github/workflows/ia.yml'
+
+jobs:
+  build-ia:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v3
+
+      - name: 🐳 Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: 🏗️ Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ia:${{ github.ref_name }} ./IA
+
+      - name: 📤 Push Docker image
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/ia:${{ github.ref_name }}
