@@ -18,9 +18,15 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: 🐛 Debug variables
+        run: |
+          echo "USERNAME = ${{ secrets.DOCKER_USERNAME }}"
+          echo "BRANCH = ${{ github.ref_name }}"
+
 
       - name: 🏗️ Build Docker image
-        run: docker buildx build --tag ${{ secrets.DOCKER_USERNAME }}/front:${{ github.ref_name }} ./front --load
+        run: docker buildx build --tag quentincrn08/front:main ./front --load
+
 
 
       - name: 📤 Push Docker image
