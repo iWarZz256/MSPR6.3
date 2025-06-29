@@ -6,7 +6,6 @@ import {
 } from 'recharts'
 import { useEffect, useRef, useState } from 'react'
 import * as turf from '@turf/turf'
-import ip from './ip'  
 
 //Fonction utilitaire pour vérifier si les bounds sont valides pour Leaflet
 function isValidLeafletBounds(bounds) {
@@ -77,7 +76,7 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
     }
     console.log("country.code", country.code)
     const paysIso = country.code.toLowerCase();
-    fetch(`http://${ip}:8000/predict/mortalite/${encodeURIComponent(selectedVirus)}/${paysIso}`)
+    fetch(`${API_URL}/predict/mortalite/${encodeURIComponent(selectedVirus)}/${paysIso}`)
             .then(data => {
             if (!data.ok) throw new Error(`Erreur ${data.status}`);
             return data.json();
@@ -94,7 +93,7 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
                 setTauxMortalite([]);
             });
 
-    fetch(`http://${ip}:8000/predict/transmission/${encodeURIComponent(selectedVirus)}/${paysIso}`)
+    fetch(`${API_URL}/predict/transmission/${encodeURIComponent(selectedVirus)}/${paysIso}`)
       .then(res => {
         if (!res.ok) throw new Error(`Erreur ${res.status}`);
         return res.json();
@@ -110,7 +109,7 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
         setTauxTransmission(taux);
       })
 
-    const url = `http://${ip}:8000/predict/${encodeURIComponent(selectedVirus)}/${paysIso}`;
+    const url = `${API_URL}/predict/${encodeURIComponent(selectedVirus)}/${paysIso}`;
     console.log("➡️ URL prédiction :", url);
     fetch(url)
       .then(res => {
@@ -140,7 +139,7 @@ export default function CountryModal({ country, onClose, selectedVirus }) {
     useEffect(() => {
         if (!country?.code) return
 
-        fetch(`http://${ip}:8000/suivis/pays/${country.code}?pandemie=${encodeURIComponent(selectedVirus)}`)
+        fetch(`${API_URL}/suivis/pays/${country.code}?pandemie=${encodeURIComponent(selectedVirus)}`)
 
             .then(res => res.json())
             .then(data => {

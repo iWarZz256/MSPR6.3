@@ -13,8 +13,8 @@ import 'leaflet/dist/leaflet.css'
 import './modern_medical_dashboard.css'
 import WorldMap from './components/WorldMap'
 import { Link, useLocation } from 'react-router-dom'
-import ip from './components/ip'
 import LoadingScreen from './components/LoadingScreen'
+const API_URL = import.meta.env.VITE_API_URL;
 
 
 countries.registerLocale(frLocale)
@@ -62,7 +62,7 @@ export default function PandemicDashboard() {
   const [virusPieData, setVirusPieData] = useState([])
 
   useEffect(() => {
-    fetch(`http://${ip}:8000/suivis/last-per-virus`)
+    fetch(`${API_URL}/suivis/last-per-virus`)
       .then(res => res.json())
       .then(data => {
         const pie = data.map(item => ({
@@ -77,7 +77,7 @@ export default function PandemicDashboard() {
   useEffect(() => {
     if (!selectedVirus) return;
 
-    fetch(`http://${ip}:8000/suivis/last-per-continent?pandemie=${encodeURIComponent(selectedVirus)}`)
+    fetch(`${API_URL}/suivis/last-per-continent?pandemie=${encodeURIComponent(selectedVirus)}`)
       .then((res) => res.json())
       .then((data) => {
         const formatted = data
@@ -97,7 +97,7 @@ export default function PandemicDashboard() {
 
   useEffect(() => {
     setIsLoading(true)
-    fetch(`http://${ip}:8000/suivis`)
+    fetch(`${API_URL}/suivis`)
       .then((res) => res.json())
       .then((data) => {
         const structured = {}
@@ -209,15 +209,6 @@ export default function PandemicDashboard() {
           >
             ⚙️ Administration
           </Link>
-          <button
-            onClick={() => {
-              localStorage.removeItem('token')
-              window.location.href = '/login'
-            }}
-            className="transition px-4 py-2 rounded-lg text-sm bg-red-600 hover:bg-red-700"
-          >
-            🔓 Déconnexion
-          </button>
         </div>
       </nav>
 
@@ -317,7 +308,7 @@ export default function PandemicDashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={multiVirusMonthlyData} margin={{ left: 60 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month" />
+                      <XAxis dataKey="month"  />
                       <YAxis tickFormatter={value => value >= 1_000_000 ? value / 1_000_000 + 'M' : value >= 1_000 ? value / 1_000 + 'k' : value} />
                       <Tooltip />
                       <Legend />
