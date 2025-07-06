@@ -39,3 +39,9 @@ pip install pandas sqlalchemy mysql-connector-python statsmodels scikit-learn ma
 pip install python-dotenv
 pip install xgboost
 pip install fastapi
+
+## Monitoring ##
+pip install prometheus_client
+
+## lancement docker ##
+Dans dossier pandemie
