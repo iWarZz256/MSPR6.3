@@ -7,28 +7,21 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setError('');
+  const handleLogin = (e) => {
+  e.preventDefault();
+  setError('');
 
-    try {
-      const res = await fetch(`http://${ip}:8000/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password }),
-      });
+  const hardcodedUsername = 'admin';
+  const hardcodedPassword = 'secret123';
 
-      if (!res.ok) {
-        throw new Error('Identifiants incorrects');
-      }
+  if (username === hardcodedUsername && password === hardcodedPassword) {
+    localStorage.setItem('token', 'fake-token'); // simulate token storage
+    navigate('/');
+  } else {
+    setError("Nom d'utilisateur ou mot de passe incorrect");
+  }
+};
 
-      const data = await res.json();
-      localStorage.setItem('token', data.access_token);
-      navigate('/');
-    } catch (err) {
-      setError(err.message);
-    }
-  };
 
 
   return (

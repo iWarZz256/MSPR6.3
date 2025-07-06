@@ -1,4 +1,4 @@
-# MSPR6.2
+# MSPR6.3 et 6.4
 Installer le front
 Dans le dossier front 
 1 - ouvrir le terminal
@@ -45,3 +45,4 @@ pip install prometheus_client
 
 ## lancement docker ##
 Dans dossier pandemie
+
