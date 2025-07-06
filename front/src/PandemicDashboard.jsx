@@ -14,6 +14,8 @@ import './modern_medical_dashboard.css'
 import WorldMap from './components/WorldMap'
 import { Link, useLocation } from 'react-router-dom'
 import LoadingScreen from './components/LoadingScreen'
+import { useNavigate } from 'react-router-dom';
+
 const API_URL = import.meta.env.VITE_API_URL;
 
 
@@ -60,6 +62,13 @@ export default function PandemicDashboard() {
   const [multiVirusMonthlyData, setMultiVirusMonthlyData] = useState([]);
   const [continentComparisonData, setContinentComparisonData] = useState([])
   const [virusPieData, setVirusPieData] = useState([])
+
+  const navigate = useNavigate();
+  const handleLogout = () => {
+    localStorage.removeItem('token'); // ou sessionStorage si c’est ce que tu utilises
+    navigate('/login'); // redirige vers la page de login
+  };
+
 
   useEffect(() => {
     fetch(`${API_URL}/suivis/last-per-virus`)
@@ -194,7 +203,7 @@ export default function PandemicDashboard() {
           ))}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <Link
             to="/"
             className={`transition px-4 py-2 rounded-lg text-sm ${location.pathname === '/' ? 'bg-white text-blue-800 font-bold' : 'hover:bg-blue-700'
@@ -209,7 +218,14 @@ export default function PandemicDashboard() {
           >
             ⚙️ Administration
           </Link>
+          <button
+            onClick={handleLogout}
+            className="transition px-4 py-2 rounded-lg text-sm bg-red-600 hover:bg-red-700 text-white"
+          >
+            🔓 Déconnexion
+          </button>
         </div>
+
       </nav>
 
 
@@ -308,7 +324,7 @@ export default function PandemicDashboard() {
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={multiVirusMonthlyData} margin={{ left: 60 }}>
                       <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="month"  />
+                      <XAxis dataKey="month" />
                       <YAxis tickFormatter={value => value >= 1_000_000 ? value / 1_000_000 + 'M' : value >= 1_000 ? value / 1_000 + 'k' : value} />
                       <Tooltip />
                       <Legend />
