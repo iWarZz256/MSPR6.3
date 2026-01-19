@@ -81,7 +81,7 @@ def create_suivi(db: Session, suivi: schemas.SuiviPandemieCreate):
     return db_suivi
 
 def get_last_suivi_by_pays(db: Session):
-    # pays_isos = {p: p.code_lettre for p in db.query(models.Pays).all()}
+    
     pays_isos = {p.id: p.code_lettre for p in db.query(models.Pays).all()}  # <-- correction ici
     # pandemie_noms = {p.id_pandemie: p.nom_maladie for p in db.query(models.Pandemie).all()}
     pandemie_noms = {p.id_pandemie: p.nom_maladie for p in db.query(models.Pandemie).all()}  # <-- ici

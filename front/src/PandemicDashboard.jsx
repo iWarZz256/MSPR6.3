@@ -1,7 +1,5 @@
 // Fichier React simplifié pour une version uniquement desktop du Dashboard
 import { useState, useEffect, useRef } from 'react'
-import { MapContainer, TileLayer, GeoJSON, useMap } from 'react-leaflet'
-import L from 'leaflet'
 import countries from 'i18n-iso-countries'
 import frLocale from 'i18n-iso-countries/langs/fr.json'
 import {
